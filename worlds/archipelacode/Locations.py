@@ -19,7 +19,7 @@ def generate_locations() -> list[(str, LocData)]:
     output = []
 
     for id, problem in data.items():
-        output.append((problem["titleSlug"], LocData(int(id), problem["title"], "Menu")))
+        output.append((problem["titleSlug"], LocData(int(id), problem["title"], problem["titleSlug"], problem["difficulty"])))
 
     return output
 

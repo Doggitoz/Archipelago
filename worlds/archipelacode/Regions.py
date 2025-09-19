@@ -1,21 +1,54 @@
 from typing import TYPE_CHECKING
 from BaseClasses import Region
-from .Locations import get_location_table
-from .Types import ArchipelaCodeLocation
+from .Types import ArchipelaCodeLocation, LocData
+from typing import List
+import numpy as np
 
 if TYPE_CHECKING:
     from . import ArchipelaCodeWorld
 
-def create_regions(world: "ArchipelaCodeWorld"):
-    menu = create_region(world, "Menu")
 
-def create_region(world: "ArchipelaCodeWorld", name: str) -> Region:
+def create_regions(world: "ArchipelaCodeWorld"):
+    world.origin_region_name = "Starter Problems"
+    loc_arrays = np.array_split(world.included_locations, 5)
+    starter_problems = create_region(world, "Starter Problems", locations=loc_arrays[0].tolist())
+    batch_1 = create_region_and_connect(world, "Extra Problem Batch 1", "Starter Problems -> Extra Problem Batch 1", starter_problems, locations=loc_arrays[1].tolist())
+    batch_2 = create_region_and_connect(world, "Extra Problem Batch 2", "Extra Problem Batch 1 -> Extra Problem Batch 2", batch_1, locations=loc_arrays[2].tolist())
+    batch_3 = create_region_and_connect(world, "Extra Problem Batch 3", "Extra Problem Batch 2 -> Extra Problem Batch 3", batch_2, locations=loc_arrays[3].tolist())
+    batch_4 = create_region_and_connect(world, "Extra Problem Batch 4", "Extra Problem Batch 3 -> Extra Problem Batch 4", batch_3, locations=loc_arrays[4].tolist())
+
+
+def create_region(
+    world: "ArchipelaCodeWorld", name: str, locations: List[LocData]
+) -> Region:
     reg = Region(name, world.player, world.multiworld)
-    
-    for (key, data) in get_location_table().items():
-        if data.region == name:
-            loc = ArchipelaCodeLocation(world.player, data.name, data.id, reg)
-            reg.locations.append(loc)
-            
+
+    for data in locations:
+        loc = ArchipelaCodeLocation(world.player, data[1], int(data[0]), reg)
+        reg.locations.append(loc)
+
     world.multiworld.regions.append(reg)
+    return reg
+
+
+def create_region_and_connect(
+    world: "ArchipelaCodeWorld",
+    name: str,
+    entrancename: str,
+    connected_region: Region,
+    locations: List[LocData],
+    is_exit: bool = True,
+) -> Region:
+    reg: Region = create_region(world, name, locations)
+    entrance_region: Region
+    exit_region: Region
+
+    if is_exit:
+        entrance_region = connected_region
+        exit_region = reg
+    else:
+        entrance_region = reg
+        exit_region = connected_region
+
+    entrance_region.connect(exit_region, entrancename)
     return reg

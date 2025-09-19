@@ -23,6 +23,13 @@ class EndGoal(Range):
     range_end = 100
     default = 15
     
+class TotalProblemCount(Range):
+    """How many total problems to include."""
+    display_name = "Total Problems"
+    range_start = 10
+    range_end = 200
+    default = 50
+    
 class EnablePython(DefaultOnToggle):
     """Whether or not to include the Python language."""
     display_name = "Enable Python"
@@ -36,6 +43,8 @@ class APCodeOptions(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     
     EndGoal: EndGoal
+    
+    TotalProblemCount: TotalProblemCount
     
     EnablePython: EnablePython
     EnableJavascript: EnableJavascript

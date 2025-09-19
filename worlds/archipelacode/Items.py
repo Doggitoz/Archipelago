@@ -30,7 +30,7 @@ def create_itempool(world: "ArchipelaCodeWorld") -> List[Item]:
         itempool += create_multiple_items(world, name, item_frequencies.get(name, 1), item_type)
         
     
-    itempool += create_junk_items(world, get_total_locations(world) - len(itempool))
+    itempool += create_junk_items(world, len(world.included_locations) - len(itempool))
     return itempool
 
 def create_item(world: "ArchipelaCodeWorld", name: str) -> Item:
@@ -71,7 +71,7 @@ junk_items = { # 1000 range for junk items
 misc_items = { # 2000 range for misc items
     "Progressive Line Count": ItemData(6700902000, ItemClassification.progression, "misc"),
     "Progressive Character Limit": ItemData(6700902001, ItemClassification.progression, "misc"),
-    "Progressive Difficulty Unlock": ItemData(6700902002, ItemClassification.progression, "misc")
+    "Progressive Problem Unlock": ItemData(6700902002, ItemClassification.progression, "misc")
 }
 
 python_items = { # 3100 range for Python items
@@ -91,7 +91,7 @@ item_table = {
 }
 
 item_frequencies = {
-    "Progressive Difficulty Unlock": 2
+    "Progressive Problem Unlock": 4
 }
 
 junk_weights = {

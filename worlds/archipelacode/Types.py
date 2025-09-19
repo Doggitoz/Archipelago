@@ -10,7 +10,8 @@ class ItemData(NamedTuple):
 class LocData(NamedTuple):
     id: int = 0
     name: str = "New Item"
-    region: str = "Menu"
+    title_slug: str = "new-item"
+    difficulty: str = "EASY"
     
 class ArchipelaCodeItem(Item):
     game = "ArchipelaCode"
