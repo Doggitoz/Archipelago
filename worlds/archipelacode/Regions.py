@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from BaseClasses import Region
 from .Types import ArchipelaCodeLocation, LocData
 from typing import List
-import numpy as np
+from .Helpers import split_array
 
 if TYPE_CHECKING:
     from . import ArchipelaCodeWorld
@@ -10,13 +10,12 @@ if TYPE_CHECKING:
 
 def create_regions(world: "ArchipelaCodeWorld"):
     world.origin_region_name = "Starter Problems"
-    loc_arrays = np.array_split(world.included_locations, 5)
-    starter_problems = create_region(world, "Starter Problems", locations=loc_arrays[0].tolist())
-    batch_1 = create_region_and_connect(world, "Extra Problem Batch 1", "Starter Problems -> Extra Problem Batch 1", starter_problems, locations=loc_arrays[1].tolist())
-    batch_2 = create_region_and_connect(world, "Extra Problem Batch 2", "Extra Problem Batch 1 -> Extra Problem Batch 2", batch_1, locations=loc_arrays[2].tolist())
-    batch_3 = create_region_and_connect(world, "Extra Problem Batch 3", "Extra Problem Batch 2 -> Extra Problem Batch 3", batch_2, locations=loc_arrays[3].tolist())
-    batch_4 = create_region_and_connect(world, "Extra Problem Batch 4", "Extra Problem Batch 3 -> Extra Problem Batch 4", batch_3, locations=loc_arrays[4].tolist())
-
+    loc_arrays = split_array(world.included_locations, 5)
+    starter_problems = create_region(world, "Starter Problems", locations=loc_arrays[0])
+    batch_1 = create_region_and_connect(world, "Extra Problem Batch 1", "Starter Problems -> Extra Problem Batch 1", starter_problems, locations=loc_arrays[1])
+    batch_2 = create_region_and_connect(world, "Extra Problem Batch 2", "Extra Problem Batch 1 -> Extra Problem Batch 2", batch_1, locations=loc_arrays[2])
+    batch_3 = create_region_and_connect(world, "Extra Problem Batch 3", "Extra Problem Batch 2 -> Extra Problem Batch 3", batch_2, locations=loc_arrays[3])
+    batch_4 = create_region_and_connect(world, "Extra Problem Batch 4", "Extra Problem Batch 3 -> Extra Problem Batch 4", batch_3, locations=loc_arrays[4])
 
 def create_region(
     world: "ArchipelaCodeWorld", name: str, locations: List[LocData]

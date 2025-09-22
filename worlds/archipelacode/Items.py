@@ -58,6 +58,11 @@ def create_junk_items(world: "ArchipelaCodeWorld", count: int) -> List[Item]:
         
     return junk_pool
 
+def get_item_name_from_id(id: int) -> str:
+    for item_name, item in item_table.items():
+        if item.code == id:
+            return item_name
+
 junk_items = { # 1000 range for junk items
     "Github Copilot": ItemData(6700901000, ItemClassification.filler, "junk"),
     "Claude Code": ItemData(6700901001, ItemClassification.filler, "junk"),

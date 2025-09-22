@@ -5,9 +5,9 @@ from .Options import APCodeOptions
 from .Items import item_table, create_itempool, junk_weights, create_item
 from .Locations import get_location_names, get_location_table
 from .Regions import create_regions
-from .Types import LocData
+from .Types import LocData, Language
 from .Rules import set_rules
-import numpy as np
+from .Helpers import split_array
 
 
 class ArchiwebaCode(WebWorld):
@@ -20,11 +20,12 @@ class ArchipelaCodeWorld(World):
     game = "ArchipelaCode"
     web = ArchiwebaCode()
     options_dataclass = APCodeOptions
-    options = APCodeOptions
+    options: APCodeOptions = APCodeOptions
     item_name_to_id = {name: data.code for name, data in item_table.items()}
     location_name_to_id = get_location_names()
 
     included_locations: List[LocData] = []
+    included_languages: List[Language] = []
 
     def __init__(self, multiworld: "MultiWorld", player: int):
         super().__init__(multiworld, player)
@@ -44,21 +45,36 @@ class ArchipelaCodeWorld(World):
         create_regions(self)
 
     def generate_early(self):
+        if self.options.EnablePython:
+            self.included_languages.append(Language("Python3", ["python3"]))
+        if self.options.EnableJavascript:
+            self.included_languages.append(Language("Javascript", ["javascript"]))
+        
         easy_locations: List[LocData] = []
         medium_locations: List[LocData] = []
         hard_locations: List[LocData] = []
         for _, data in get_location_table().items():
+            included_slugs: List[str] = []
+            for langSlug in data.lang_slugs:
+                for lang in self.included_languages:
+                    if langSlug in lang.langSlugs:
+                        included_slugs.append(langSlug)
+            if len(included_slugs) == 0:
+                continue
+            new_loc = LocData(data.id, data.name, data.title_slug, data.difficulty, included_slugs, data.required_features)
             match data.difficulty:
                 case "EASY":
-                    easy_locations.append(data)
+                    easy_locations.append(new_loc)
                 case "MEDIUM":
-                    medium_locations.append(data)
+                    medium_locations.append(new_loc)
                 case "HARD":
-                    hard_locations.append(data)
+                    hard_locations.append(new_loc)
         
         self.included_locations.extend(self.random.choices(easy_locations, k=round(self.options.TotalProblemCount * 0.4)))
         self.included_locations.extend(self.random.choices(medium_locations, k=round(self.options.TotalProblemCount * 0.3)))
         self.included_locations.extend(self.random.choices(hard_locations, k=round(self.options.TotalProblemCount * 0.3)))
+        
+        self.included_locations = self.lightly_shuffle(self.included_locations, 0.08) # Makes it so you don't only get easy problems in the first few batches, while still giving you generally easier problems at the start
         
         for _ in range(3): # it's 4 AM and I'm too tired to figure out a better solution. I don't even know why it's happening. - ShackledMars261, 9/19/25 4:19 AM
             dupe_check: list[str] = []
@@ -90,11 +106,22 @@ class ArchipelaCodeWorld(World):
         set_rules(self)
         
     def fill_slot_data(self):
-        loc_arrays = np.array_split(self.included_locations, 5)
-        slot_data: Dict[str, any] = {"regions": {}}
+        loc_arrays = split_array(self.included_locations, 5)
+        slot_data: Dict[str, any] = {"regions": {}, "metadata": {"included_languages": {}}}
         for index, array in enumerate(loc_arrays):
             slot_data["regions"][str(index)] = {}
             for loc in array:
-                slot_data["regions"][str(index)][loc[0]] = {"id": int(loc[0]), "title": loc[1], "titleSlug": loc[2], "difficulty": loc[3]}
+                slot_data["regions"][str(index)][loc.id] = {"id": int(loc.id), "title": loc.name, "titleSlug": loc.title_slug, "difficulty": loc.difficulty}
+                
+        slot_data["metadata"]["EndGoal"] = int(self.options.EndGoal.value)
+        
+        slot_data["metadata"]["included_languages"]["python3"] = True if self.options.EnablePython else False
+        slot_data["metadata"]["included_languages"]["javascript"] = True if self.options.EnableJavascript else False
+        
+        print(f"Python {"Enabled" if self.options.EnablePython else "Disabled"}")
+        print(f"Javascript {"Enabled" if self.options.EnableJavascript else "Disabled"}")
                 
         return slot_data
+    
+    def lightly_shuffle(self, orig_list: List, orderliness: float = 0.2) -> List:
+        return sorted(orig_list, key=lambda i: self.random.gauss(orig_list.index(i) * orderliness, 1))

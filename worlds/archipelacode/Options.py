@@ -21,7 +21,7 @@ class EndGoal(Range):
     display_name = "End Goal"
     range_start = 1
     range_end = 100
-    default = 15
+    default = 30
     
 class TotalProblemCount(Range):
     """How many total problems to include."""
