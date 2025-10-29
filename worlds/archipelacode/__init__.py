@@ -1,6 +1,4 @@
-from typing import Dict, List
-
-from BaseClasses import Item, MultiWorld
+from BaseClasses import Item, MultiWorld, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
 from .Helpers import split_array
@@ -14,6 +12,16 @@ from .Types import Language, LocData, VersionIdentifier
 
 class ArchiwebaCode(WebWorld):
     theme = "partyTime"
+    tutorials = [
+        Tutorial(
+            "Multiworld Setup Guide",
+            "A guide for setting up ArchipelaCode to be played in Archipelago.",
+            "English",
+            "setup_en.md",
+            "setup/en",
+            ["ShackledMars261"],
+        )
+    ]
 
 
 class ArchipelaCodeWorld(World):
@@ -25,10 +33,11 @@ class ArchipelaCodeWorld(World):
     options: APCodeOptions = APCodeOptions
     item_name_to_id = {name: data.code for name, data in item_table.items()}
     location_name_to_id = get_location_names()
+
     archipelacode_apworld_version: VersionIdentifier = VersionIdentifier(0, 0, 1)
 
-    included_locations: List[LocData] = []
-    included_languages: List[Language] = []
+    included_locations: list[LocData] = []
+    included_languages: list[Language] = []
 
     def __init__(self, multiworld: "MultiWorld", player: int):
         super().__init__(multiworld, player)
@@ -40,9 +49,7 @@ class ArchipelaCodeWorld(World):
         self.multiworld.itempool += create_itempool(self)
 
     def get_filler_item_name(self) -> str:
-        return self.random.choices(
-            list(junk_weights.keys()), weights=junk_weights.values(), k=1
-        )[0]
+        return self.random.choices(list(junk_weights.keys()), weights=junk_weights.values(), k=1)[0]
 
     def create_regions(self):
         create_regions(self)
@@ -57,11 +64,11 @@ class ArchipelaCodeWorld(World):
         if self.options.EnableGolang:
             self.included_languages.append(Language("Golang", ["golang"]))
 
-        easy_locations: List[LocData] = []
-        medium_locations: List[LocData] = []
-        hard_locations: List[LocData] = []
-        for _, data in get_location_table().items():
-            included_slugs: List[str] = []
+        easy_locations: list[LocData] = []
+        medium_locations: list[LocData] = []
+        hard_locations: list[LocData] = []
+        for data in get_location_table().values():
+            included_slugs: list[str] = []
             for lang_slug in data.lang_slugs:
                 for lang in self.included_languages:
                     if lang_slug in lang.langSlugs:
@@ -85,19 +92,13 @@ class ArchipelaCodeWorld(World):
                     hard_locations.append(new_loc)
 
         self.included_locations.extend(
-            self.random.choices(
-                easy_locations, k=round(self.options.TotalProblemCount * 0.4)
-            )
+            self.random.choices(easy_locations, k=round(self.options.TotalProblemCount * 0.4))
         )
         self.included_locations.extend(
-            self.random.choices(
-                medium_locations, k=round(self.options.TotalProblemCount * 0.3)
-            )
+            self.random.choices(medium_locations, k=round(self.options.TotalProblemCount * 0.3))
         )
         self.included_locations.extend(
-            self.random.choices(
-                hard_locations, k=round(self.options.TotalProblemCount * 0.3)
-            )
+            self.random.choices(hard_locations, k=round(self.options.TotalProblemCount * 0.3))
         )
 
         self.included_locations = self.lightly_shuffle(
@@ -136,7 +137,7 @@ class ArchipelaCodeWorld(World):
 
     def fill_slot_data(self):
         loc_arrays = split_array(self.included_locations, 5)
-        slot_data: Dict[str, any] = {
+        slot_data: dict[str, any] = {
             "regions": {},
             "metadata": {"included_languages": {}},
         }
@@ -158,21 +159,15 @@ class ArchipelaCodeWorld(World):
             f"{self.archipelacode_apworld_version.major}.{self.archipelacode_apworld_version.minor}.{self.archipelacode_apworld_version.patch}"
         )
 
-        slot_data["metadata"]["included_languages"]["python3"] = (
-            True if self.options.EnablePython else False
-        )
-        slot_data["metadata"]["included_languages"]["javascript"] = (
-            True if self.options.EnableJavascript else False
-        )
+        slot_data["metadata"]["included_languages"]["python3"] = True if self.options.EnablePython else False
+        slot_data["metadata"]["included_languages"]["javascript"] = True if self.options.EnableJavascript else False
 
         print(f"Python {'Enabled' if self.options.EnablePython else 'Disabled'}")
-        print(
-            f"Javascript {'Enabled' if self.options.EnableJavascript else 'Disabled'}"
-        )
+        print(f"Javascript {'Enabled' if self.options.EnableJavascript else 'Disabled'}")
 
         return slot_data
 
-    def lightly_shuffle(self, orig_list: List, orderliness: float = 0.2) -> List:
+    def lightly_shuffle(self, orig_list: list, orderliness: float = 0.2) -> list:
         return sorted(
             orig_list,
             key=lambda i: self.random.gauss(orig_list.index(i) * orderliness, 1),
