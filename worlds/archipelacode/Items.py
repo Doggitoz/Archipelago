@@ -26,10 +26,15 @@ def create_itempool(world: "ArchipelaCodeWorld") -> List[Item]:
         if data.language == "js" and not world.options.EnableJavascript:
             continue
         
+        if data.language == "ts" and not world.options.EnableTypescript:
+            continue
+        
+        if data.language == "go" and not world.options.EnableGolang:
+            continue
         
         itempool += create_multiple_items(world, name, item_frequencies.get(name, 1), item_type)
         
-    
+        
     itempool += create_junk_items(world, len(world.included_locations) - len(itempool))
     return itempool
 
@@ -82,7 +87,24 @@ misc_items = { # 2000 range for misc items
 python_items = { # 3100 range for Python items
     "Python 'if'": ItemData(6700903100, ItemClassification.progression, "py"),
     "Python 'for'": ItemData(6700903101, ItemClassification.useful, "py"),
-    "Python '='": ItemData(6700903102, ItemClassification.progression, "py")
+    "Python '='": ItemData(6700903102, ItemClassification.progression, "py"),
+    "Python Comparison Operators": ItemData(6700903103, ItemClassification.progression, "py"),
+    "Python 'while'": ItemData(6700903104, ItemClassification.useful, "py"),
+    "Python 'else'": ItemData(6700903105, ItemClassification.useful, "py"),
+    "Python 'elif'": ItemData(6700903106, ItemClassification.useful, "py"),
+    "Python 'match'": ItemData(6700903107, ItemClassification.useful, "py"),
+    "Python '+'": ItemData(6700903108, ItemClassification.progression, "py"),
+    "Python '-'": ItemData(6700903109, ItemClassification.progression, "py"),
+    "Python '*'": ItemData(6700903110, ItemClassification.progression, "py"),
+    "Python '/'": ItemData(6700903111, ItemClassification.progression, "py"),
+    "Python '**'": ItemData(6700903112, ItemClassification.useful, "py"),
+    "Python '//'": ItemData(6700903113, ItemClassification.useful, "py"),
+    "Python '%'": ItemData(6700903114, ItemClassification.useful, "py"),
+    "Python 'and'": ItemData(6700903115, ItemClassification.useful, "py"),
+    "Python 'or'": ItemData(6700903116, ItemClassification.progression, "py"),
+    "Python 'not'": ItemData(6700903117, ItemClassification.progression, "py"),
+    "Python 'is'": ItemData(6700903118, ItemClassification.useful, "py"),
+    "Python 'in'": ItemData(6700903119, ItemClassification.useful, "py"),
 }
 
 apcode_items = { # 6700900000 range for items

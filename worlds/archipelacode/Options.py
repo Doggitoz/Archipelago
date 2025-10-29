@@ -30,6 +30,13 @@ class TotalProblemCount(Range):
     range_end = 200
     default = 50
     
+class FreebieCheckCount(Range):
+    """How many free checks to give out. Highly recommended to have at least a few."""
+    display_name = "Freebie Check Count"
+    range_start = 0
+    range_end = 10
+    default = 3
+    
 class EnablePython(DefaultOnToggle):
     """Whether or not to include the Python language."""
     display_name = "Enable Python"
@@ -37,6 +44,22 @@ class EnablePython(DefaultOnToggle):
 class EnableJavascript(Toggle):
     """Whether or not to include the Javascript language."""
     display_name = "Enable Javascript"
+    
+class EnableTypescript(Toggle):
+    """Whether or not to include the Typescript language."""
+    display_name = "Enable Typescript"
+    
+class EnableGolang(Toggle):
+    """Whether or not to include the Golang language."""
+    display_name = "Enable Golang"
+    
+class EnableUniversalLanguageFeatures(Toggle):
+    """Whether or not to unlock features for all languages, rather than specific ones. Example: \"Universal if statements\" vs. \"Python if statements\""""
+    display_name = "Enable Universal Language Features"
+    
+class EnableRestrictiveProblems(Toggle):
+    """Whether or not to force you into a specific random language for every problem."""
+    display_name = "Enable Restrictive Problems"
 
 @dataclass
 class APCodeOptions(PerGameCommonOptions):
@@ -45,8 +68,14 @@ class APCodeOptions(PerGameCommonOptions):
     EndGoal: EndGoal
     
     TotalProblemCount: TotalProblemCount
+    FreebieCheckCount: FreebieCheckCount
+    
+    EnableUniversalLanguageFeatures: EnableUniversalLanguageFeatures
+    EnableRestrictiveProblems: EnableRestrictiveProblems
     
     EnablePython: EnablePython
     EnableJavascript: EnableJavascript
+    EnableTypescript: EnableTypescript
+    EnableGolang: EnableGolang
 
 apcode_option_groups: Dict[str, List[Any]] = {}
