@@ -26,7 +26,7 @@ class EndGoal(Range):
     display_name = "End Goal"
     range_start = 1
     range_end = 100
-    default = 80
+    default = 60
 
 
 class TotalProblemCount(Range):

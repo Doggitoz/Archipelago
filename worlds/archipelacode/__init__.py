@@ -40,7 +40,7 @@ class ArchipelaCodeWorld(World):
     game = "ArchipelaCode"
     web = ArchiwebaCode()
     options_dataclass = APCodeOptions
-    options: APCodeOptions = APCodeOptions
+    options: APCodeOptions
     item_name_to_id = {name: data.code for name, data in item_table.items()}
     location_name_to_id = get_location_names()
 
