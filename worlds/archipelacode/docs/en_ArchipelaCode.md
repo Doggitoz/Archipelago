@@ -3,7 +3,7 @@
 ## What is ArchipelaCode?
 
 ArchipelaCode is an implementation of LeetCode problems for Archipelago created by ShackledMars261.
-It tasks you with a random selection of (free) programming problems for you to solve. However, you must unlock various "language features", including variable declaration, if statements, comparison operators, and more.
+It tasks you with solving a random selection of (free) programming problems. However, you must unlock various "language features", including variable declaration, if statements, comparison operators, and more.
 
 NOTE: ArchipelaCode is currently on v0.0.1 (at the time of writing this). THERE WILL BE BUGS! I've played through a few Multiworlds by myself with no major errors, but I'm sure you will find some. If you do find one, please ping me (@ShackledMars261) in the [ArchipelaCode post](https://discord.com/channels/731205301247803413/1409443049381040128) inside of [#future-game-design](https://discord.com/channels/731205301247803413/1009608126321922180) in the [Archipelago Discord server](https://discord.gg/archipelago).
 
