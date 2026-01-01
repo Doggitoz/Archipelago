@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import Item, ItemClassification
 
+from .Options import LanguageChoice
 from .Types import ArchipelaCodeItem, ItemData
 
 if TYPE_CHECKING:
@@ -22,19 +23,37 @@ def create_itempool(world: "ArchipelaCodeWorld") -> list[Item]:
         if item_type is ItemClassification.filler or item_type is ItemClassification.trap:
             continue
 
-        if data.language == "py" and not world.options.EnablePython:
+        # if data.code in world.precollected_items:
+        # continue
+
+        # PLANNED:
+        # if data.language == "py" and not world.options.EnablePython:
+        # continue
+        #
+        # if data.language == "js" and not world.options.EnableJavascript:
+        # continue
+        #
+        # if data.language == "ts" and not world.options.EnableTypescript:
+        # continue
+        #
+        # if data.language == "go" and not world.options.EnableGolang:
+        # continue
+
+        if data.language == "py" and not (world.options.LanguageChoice == LanguageChoice.option_python):
             continue
 
-        if data.language == "js" and not world.options.EnableJavascript:
+        if data.language == "js" and not (world.options.LanguageChoice == LanguageChoice.option_javascript):
             continue
 
-        if data.language == "ts" and not world.options.EnableTypescript:
+        if data.language == "ts" and not (world.options.LanguageChoice == LanguageChoice.option_typescript):
             continue
 
-        if data.language == "go" and not world.options.EnableGolang:
+        if data.language == "go" and not (world.options.LanguageChoice == LanguageChoice.option_golang):
             continue
 
-        itempool += create_multiple_items(world, name, item_frequencies.get(name, 1), item_type)
+        amount_to_create: int = item_frequencies.get(name, 1) - world.precollected_items.count(name)
+
+        itempool += create_multiple_items(world, name, amount_to_create, item_type)
 
     itempool += create_junk_items(world, len(world.included_locations) - len(itempool))
     return itempool
@@ -90,38 +109,62 @@ junk_items = {  # 1000 range for junk items
 }
 
 misc_items = {  # 2000 range for misc items
-    "Progressive Line Count": ItemData(6700902000, ItemClassification.progression, "misc"),
-    "Progressive Character Limit": ItemData(6700902001, ItemClassification.progression, "misc"),
+    # "Progressive Line Count": ItemData(6700902000, ItemClassification.progression, "misc"),  # UNIMPLEMENTED CURRENTLY
+    # "Progressive Character Limit": ItemData(6700902001, ItemClassification.progression, "misc"),  # UNIMPLEMENTED CURRENTLY
     "Progressive Problem Unlock": ItemData(6700902002, ItemClassification.progression, "misc"),
 }
 
 python_items = {  # 3100 range for Python items
     "Python 'if'": ItemData(6700903100, ItemClassification.progression, "py"),
-    "Python 'for'": ItemData(6700903101, ItemClassification.useful, "py"),
+    "Python 'for'": ItemData(6700903101, ItemClassification.progression, "py"),
     "Python '='": ItemData(6700903102, ItemClassification.progression, "py"),
     "Python Comparison Operators": ItemData(6700903103, ItemClassification.progression, "py"),
-    "Python 'while'": ItemData(6700903104, ItemClassification.useful, "py"),
-    "Python 'else'": ItemData(6700903105, ItemClassification.useful, "py"),
-    "Python 'elif'": ItemData(6700903106, ItemClassification.useful, "py"),
-    "Python 'match'": ItemData(6700903107, ItemClassification.useful, "py"),
+    "Python 'while'": ItemData(6700903104, ItemClassification.progression, "py"),
+    "Python 'else'": ItemData(6700903105, ItemClassification.progression, "py"),
+    "Python 'elif'": ItemData(6700903106, ItemClassification.progression, "py"),
+    "Python 'match'": ItemData(6700903107, ItemClassification.progression, "py"),
     "Python '+'": ItemData(6700903108, ItemClassification.progression, "py"),
     "Python '-'": ItemData(6700903109, ItemClassification.progression, "py"),
     "Python '*'": ItemData(6700903110, ItemClassification.progression, "py"),
     "Python '/'": ItemData(6700903111, ItemClassification.progression, "py"),
-    "Python '**'": ItemData(6700903112, ItemClassification.useful, "py"),
-    "Python '//'": ItemData(6700903113, ItemClassification.useful, "py"),
-    "Python '%'": ItemData(6700903114, ItemClassification.useful, "py"),
-    "Python 'and'": ItemData(6700903115, ItemClassification.useful, "py"),
+    "Python '**'": ItemData(6700903112, ItemClassification.progression, "py"),
+    "Python '//'": ItemData(6700903113, ItemClassification.progression, "py"),
+    "Python '%'": ItemData(6700903114, ItemClassification.progression, "py"),
+    "Python 'and'": ItemData(6700903115, ItemClassification.progression, "py"),
     "Python 'or'": ItemData(6700903116, ItemClassification.progression, "py"),
     "Python 'not'": ItemData(6700903117, ItemClassification.progression, "py"),
-    "Python 'is'": ItemData(6700903118, ItemClassification.useful, "py"),
-    "Python 'in'": ItemData(6700903119, ItemClassification.useful, "py"),
+    "Python 'is'": ItemData(6700903118, ItemClassification.progression, "py"),
+    "Python 'in'": ItemData(6700903119, ItemClassification.progression, "py"),
+}
+
+javascript_items = {  # 3200 range for Javascript items
+    "Javascript '='": ItemData(6700903200, ItemClassification.progression, "js"),
+    "Javascript Comparison Operators": ItemData(6700903201, ItemClassification.progression, "js"),
+    "Javascript 'if'": ItemData(6700903202, ItemClassification.progression, "js"),
+    "Javascript 'else'": ItemData(6700903203, ItemClassification.progression, "js"),
+    "Javascript 'else if'": ItemData(6700903204, ItemClassification.progression, "js"),
+    "Javascript 'switch'": ItemData(6700903205, ItemClassification.progression, "js"),
+    "Javascript 'for'": ItemData(6700903206, ItemClassification.progression, "js"),
+    "Javascript 'forEach'": ItemData(6700903207, ItemClassification.progression, "js"),
+    "Javascript 'while'": ItemData(6700903208, ItemClassification.progression, "js"),
+    "Javascript '+'": ItemData(6700903209, ItemClassification.progression, "js"),
+    "Javascript '-'": ItemData(6700903210, ItemClassification.progression, "js"),
+    "Javascript '*'": ItemData(6700903211, ItemClassification.progression, "js"),
+    "Javascript '/'": ItemData(6700903212, ItemClassification.progression, "js"),
+    "Javascript '%'": ItemData(6700903213, ItemClassification.progression, "js"),
+    "Javascript '**'": ItemData(6700903214, ItemClassification.progression, "js"),
+    "Javascript Increment/Decrement": ItemData(6700903215, ItemClassification.progression, "js"),
+    "Javascript '&&'": ItemData(6700903216, ItemClassification.progression, "js"),
+    "Javascript '||'": ItemData(6700903217, ItemClassification.progression, "js"),
+    "Javascript '!'": ItemData(6700903218, ItemClassification.progression, "js"),
+    "Javascript 'in'": ItemData(6700903219, ItemClassification.progression, "js"),
 }
 
 apcode_items = {  # 6700900000 range for items
     **junk_items,  # 1000
     **misc_items,  # 2000
     **python_items,  # 3100
+    **javascript_items,  # 3200
 }
 
 item_table = {**apcode_items}

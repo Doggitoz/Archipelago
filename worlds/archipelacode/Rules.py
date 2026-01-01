@@ -12,17 +12,52 @@ if TYPE_CHECKING:
 def check_if_location_is_available(
     world: "ArchipelaCodeWorld", state: CollectionState, required_features: dict[str, list[int]]
 ) -> bool:
-    return any(
-        [
-            all([state.has(get_item_name_from_id(item_id), world.player) for item_id in lang_features])
-            for lang_features in required_features.values()
-        ]
-    )
+    # print(required_features)
+    # result = any(
+    # all(state.has(get_item_name_from_id(item_id), world.player) for item_id in lang_features)
+    # for lang_features in required_features.values()
+    # )
+
+    results: dict[str, bool] = {}
+    missing_items: list[str] = []
+
+    for slug, lang_features in required_features.items():
+        for language in world.included_languages:
+            for lang_slug in language.langSlugs:
+                if slug == lang_slug:
+                    results[slug] = True
+                    for item_id in lang_features:
+                        if not state.has(get_item_name_from_id(item_id), world.player):
+                            missing_items.append(get_item_name_from_id(item_id))
+                            results[slug] = False
+
+    # print(missing_items)
+    # print(results)
+
+    return any(results.values())
 
 
 def has_reached_goal(world: "ArchipelaCodeWorld", state: CollectionState) -> bool:
-    required_problems: int = world.options.EndGoal.value
+    required_problems: int = max(world.options.EndGoal.value, world.options.TotalProblemCount.value)
     return len(state.locations_checked) >= required_problems
+
+
+def set_custom_rules(world: "ArchipelaCodeWorld") -> None:
+    for language in world.included_languages:
+        for location in world.included_locations:
+            if (
+                language.langSlugs[0] in location.required_features.keys()
+            ):  # probably need to remove language.langSlugs[0]
+                features_count: int = 0
+                for feature_id in location.required_features[
+                    language.langSlugs[0]
+                ]:  # probably need to remove language.langSlugs[0]
+                    add_rule(
+                        world.multiworld.get_location(location.name, world.player),
+                        lambda state, fid=feature_id: state.has(get_item_name_from_id(fid), world.player),
+                    )
+                    features_count += 1
+            # print(f"Problem {location.name} has {features_count} required features")
 
 
 def set_rules(world: "ArchipelaCodeWorld") -> None:
@@ -43,10 +78,15 @@ def set_rules(world: "ArchipelaCodeWorld") -> None:
         lambda state: state.has("Progressive Problem Unlock", world.player, 4),
     )
 
-    for location in world.included_locations:
-        add_rule(
-            world.multiworld.get_location(location.name, world.player),
-            lambda state: check_if_location_is_available(world, state, location.required_features),
-        )
+    # for location in world.included_locations:
+    # add_rule(
+    # world.multiworld.get_location(location.name, world.player),
+    # lambda state: check_if_location_is_available(world, state, location.required_features),
+    # )
+    set_custom_rules(world)
 
     world.multiworld.completion_condition[world.player] = lambda state: has_reached_goal(world, state)
+
+    # Uncomment the next 2 lines in order to generate a PlantUML file that graphs the regions
+    # from Utils import visualize_regions
+    # visualize_regions(world.multiworld.get_region("Starter Problems", world.player), "archipelacode.puml")
