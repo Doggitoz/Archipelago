@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from Options import Choice, DefaultOnToggle, OptionGroup, Range, StartInventoryPool
+from Options import Choice, OptionGroup, Range, StartInventoryPool
 from worlds.AutoWorld import PerGameCommonOptions
 
 if TYPE_CHECKING:
@@ -21,12 +21,12 @@ def adjust_options(world: "ArchipelaCodeWorld"):
 
 
 class EndGoal(Range):
-    """How many problems are needed to be solved to \"win\" the game. Must be larger than \"Total Problems.\" """
+    """What percentage of problems need to be completed in order to \"win\" the game?"""
 
     display_name = "End Goal"
     range_start = 1
     range_end = 100
-    default = 30
+    default = 80
 
 
 class TotalProblemCount(Range):
@@ -47,14 +47,9 @@ class TotalProblemCount(Range):
 #     default = 3
 
 
-class StartWithBasics(DefaultOnToggle):
-    """HIGHLY RECOMMENDED TO DISABLE! Whether or not to start with some basic features unlocked. Necessary if you are generating a solo Multiworld."""
-
-    display_name = "Start with Basic Items"
-
-
 class LanguageChoice(Choice):
-    """Which programming language you want to use. Multi-language support will be added in the future."""
+    """Which programming language you want to use. Multi-language support will be added in the future.
+    CURRENTLY ONLY PYTHON IS SUPPORTED!!! (JS will be added in v0.0.2, more to follow in later versions)"""
 
     display_name = "Language Choice"
     option_python = 0
@@ -98,7 +93,6 @@ class APCodeOptions(PerGameCommonOptions):
 
     TotalProblemCount: TotalProblemCount
     # FreebieCheckCount: FreebieCheckCount
-    StartWithBasics: StartWithBasics
 
     LanguageChoice: LanguageChoice
 

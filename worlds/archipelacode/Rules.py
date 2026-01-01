@@ -38,7 +38,9 @@ def check_if_location_is_available(
 
 
 def has_reached_goal(world: "ArchipelaCodeWorld", state: CollectionState) -> bool:
-    required_problems: int = max(world.options.EndGoal.value, world.options.TotalProblemCount.value)
+    required_problems: int = round(
+        float(world.options.EndGoal.value) * float(world.options.TotalProblemCount.value) / 100.0
+    )
     return len(state.locations_checked) >= required_problems
 
 

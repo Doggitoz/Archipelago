@@ -35,7 +35,7 @@ class ArchiwebaCode(WebWorld):
 
 
 class ArchipelaCodeWorld(World):
-    """ArchipelaCode is an AP implementation for VS Code and LeetCode."""
+    """ArchipelaCode is an implementation of LeetCode problems in Archipelago, tasking you with solving a random selection of (free) programming problems. However, you must unlock various "language features", including variable declaration, if statements, comparison operators, and more."""
 
     game = "ArchipelaCode"
     web = ArchiwebaCode()
@@ -349,7 +349,9 @@ class ArchipelaCodeWorld(World):
         for item_name, item_id in self.item_name_to_id.items():
             slot_data["items"][item_id] = item_name
 
-        slot_data["metadata"]["EndGoal"] = int(self.options.EndGoal.value)
+        slot_data["metadata"]["EndGoal"] = round(
+            float(self.options.TotalProblemCount.value) * float(self.options.EndGoal.value) / 100.0
+        )
 
         slot_data["metadata"]["apworld_version"] = (
             f"{self.archipelacode_apworld_version.major}.{self.archipelacode_apworld_version.minor}.{self.archipelacode_apworld_version.patch}"
@@ -381,40 +383,28 @@ class ArchipelaCodeWorld(World):
     def create_starting_items(self) -> None:
         """Get starting items used for the StartWithBasics option."""
         items: list[Item] = []
-        if self.options.StartWithBasics:
-            for language in self.included_languages:
-                match language.lang:
-                    case "Python3":
-                        items.append(self.create_item("Progressive Problem Unlock"))
-                        items.append(self.create_item("Python 'if'"))
-                        items.append(self.create_item("Python 'else'"))
-                        items.append(self.create_item("Python 'for'"))
-                        items.append(self.create_item("Python 'while'"))
-                        items.append(self.create_item("Python '='"))
-                        items.append(self.create_item("Python Comparison Operators"))
-                        items.append(self.create_item("Python 'in'"))
-                        items.append(self.create_item("Python 'is'"))
-                        items.append(self.create_item("Python '+'"))
-                        items.append(self.create_item("Python '-'"))
-                        items.append(self.create_item("Python '*'"))
-                        items.append(self.create_item("Python '**'"))
-                        items.append(self.create_item("Python '/'"))
-                        items.append(self.create_item("Python '//'"))
-                        items.append(self.create_item("Python '%'"))
-                        items.append(self.create_item("Python 'and'"))
-                        items.append(self.create_item("Python 'not'"))
-        else:
-            pass
-            # items.append(self.create_item("Progressive Problem Unlock"))
-            # items.append(self.create_item("Python '='"))
-            # items.append(self.create_item("Python Comparison Operators"))
-            # items.append(self.create_item("Python 'in'"))
-            # items.append(self.create_item("Python '-'"))
-            # items.append(self.create_item("Python '+'"))
-            # items.append(self.create_item("Python 'if'"))
-            # items.append(self.create_item("Python 'for'"))
-            # items.append(self.create_item("Python 'and'"))
-            # items.append(self.create_item("Python 'not'"))
+        for language in self.included_languages:
+            match language.lang:
+                case "Python3":
+                    pass
+                    # items.append(self.create_item("Progressive Problem Unlock"))
+                    # items.append(self.create_item("Python 'if'"))
+                    # items.append(self.create_item("Python 'else'"))
+                    # items.append(self.create_item("Python 'for'"))
+                    # items.append(self.create_item("Python 'while'"))
+                    # items.append(self.create_item("Python '='"))
+                    # items.append(self.create_item("Python Comparison Operators"))
+                    # items.append(self.create_item("Python 'in'"))
+                    # items.append(self.create_item("Python 'is'"))
+                    # items.append(self.create_item("Python '+'"))
+                    # items.append(self.create_item("Python '-'"))
+                    # items.append(self.create_item("Python '*'"))
+                    # items.append(self.create_item("Python '**'"))
+                    # items.append(self.create_item("Python '/'"))
+                    # items.append(self.create_item("Python '//'"))
+                    # items.append(self.create_item("Python '%'"))
+                    # items.append(self.create_item("Python 'and'"))
+                    # items.append(self.create_item("Python 'not'"))
 
         for item in items:
             # print(f"Precollecting {item.name}")
