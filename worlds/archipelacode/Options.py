@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from Options import Choice, OptionGroup, Range, StartInventoryPool
+from Options import Choice, OptionGroup, OptionSet, Range, StartInventoryPool
 from worlds.AutoWorld import PerGameCommonOptions
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ def adjust_options(world: "ArchipelaCodeWorld"):
 
 
 class EndGoal(Range):
-    """The percentage of problems needed to be completed in order to \"win\" the game."""
+    """What percentage of problems need to be completed in order to \"win\" the game?"""
 
     display_name = "End Goal"
     range_start = 1
@@ -46,6 +46,13 @@ class TotalProblemCount(Range):
 #     range_end = 10
 #     default = 3
 
+class DifficultyOption(OptionSet):
+    """
+    Determines what difficulties to be included in the pool of problems. "Easy", "Medium", and "Hard" difficulties are available.
+    """
+    display_name = "Difficulty Selection"
+    default = ["Easy", "Medium", "Hard"]
+    valid_keys = ["Easy", "Medium", "Hard"]
 
 class LanguageChoice(Choice):
     """Which programming language you want to use. Multi-language support will be added in the future.
@@ -93,6 +100,8 @@ class APCodeOptions(PerGameCommonOptions):
 
     TotalProblemCount: TotalProblemCount
     # FreebieCheckCount: FreebieCheckCount
+    
+    DifficultyOption: DifficultyOption
 
     LanguageChoice: LanguageChoice
 

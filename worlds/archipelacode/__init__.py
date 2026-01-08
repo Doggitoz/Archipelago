@@ -115,9 +115,7 @@ class ArchipelaCodeWorld(World):
 
         ZERO_REQUIRED_PERCENTAGE: float = 0.20  # should probably be hidden yaml option
 
-        easy_locations: list[LocData] = []
-        medium_locations: list[LocData] = []
-        hard_locations: list[LocData] = []
+        selected_difficultes: list[str] = [difficulty.lower() for difficulty in self.options.DifficultyOption.value]
 
         locations_by_feature_count: dict[str, list[LocData]] = {}
 
@@ -125,7 +123,16 @@ class ArchipelaCodeWorld(World):
             selected_lang.langSlugs[0]
         )  # NEEDS TO BE CHANGED FOR MULTI-LANG SUPPORT
 
-        for data in get_location_table().values():
+        unfiltered_location_table = get_location_table().values()
+        filtered_locations = []
+        for problem in unfiltered_location_table:
+            if problem.difficulty.lower() not in selected_difficultes:
+                continue
+            filtered_locations.append(problem)
+        if len(filtered_locations) == 0:
+            raise ValueError("No problems found with the selected difficulties.")
+        
+        for data in filtered_locations:
             included_slugs: list[str] = []
             for lang_slug in data.lang_slugs:
                 for lang in self.included_languages:
@@ -146,16 +153,7 @@ class ArchipelaCodeWorld(World):
                     if required_feature_count not in locations_by_feature_count.keys():
                         locations_by_feature_count[required_feature_count] = []
                     locations_by_feature_count[required_feature_count].append(new_loc)
-                    if not required_feature_count == "0":
-                        match data.difficulty:
-                            case "EASY":
-                                easy_locations.append(new_loc)
-                            case "MEDIUM":
-                                medium_locations.append(new_loc)
-                            case "HARD":
-                                hard_locations.append(new_loc)
-                    break
-
+        
         locations_by_feature_count = dict(sorted(locations_by_feature_count.items(), key=lambda x: int(x[0])))
 
         # for key, values in locations_by_feature_count.items():
@@ -248,81 +246,81 @@ class ArchipelaCodeWorld(World):
         # f"Total amount of problems with zero required features: {len([loc for loc in self.included_locations if len(loc.required_features['python3']) == 0])}"
         # )
 
-    def generate_included_locations(self):
-        self.included_locations = []
-        easy_locations: list[LocData] = []
-        medium_locations: list[LocData] = []
-        hard_locations: list[LocData] = []
-        for data in get_location_table().values():
-            included_slugs: list[str] = []
-            for lang_slug in data.lang_slugs:
-                for lang in self.included_languages:
-                    if lang_slug in lang.langSlugs:
-                        included_slugs.append(lang_slug)
-            if len(included_slugs) == 0:
-                continue
-            new_loc = LocData(
-                data.id,
-                data.name,
-                data.title_slug,
-                data.difficulty,
-                included_slugs,
-                data.required_features,
-            )
-            match data.difficulty:
-                case "EASY":
-                    easy_locations.append(new_loc)
-                case "MEDIUM":
-                    medium_locations.append(new_loc)
-                case "HARD":
-                    hard_locations.append(new_loc)
+    # def generate_included_locations(self):
+    #     self.included_locations = []
+    #     easy_locations: list[LocData] = []
+    #     medium_locations: list[LocData] = []
+    #     hard_locations: list[LocData] = []
+    #     for data in get_location_table().values():
+    #         included_slugs: list[str] = []
+    #         for lang_slug in data.lang_slugs:
+    #             for lang in self.included_languages:
+    #                 if lang_slug in lang.langSlugs:
+    #                     included_slugs.append(lang_slug)
+    #         if len(included_slugs) == 0:
+    #             continue
+    #         new_loc = LocData(
+    #             data.id,
+    #             data.name,
+    #             data.title_slug,
+    #             data.difficulty,
+    #             included_slugs,
+    #             data.required_features,
+    #         )
+    #         match data.difficulty:
+    #             case "EASY":
+    #                 easy_locations.append(new_loc)
+    #             case "MEDIUM":
+    #                 medium_locations.append(new_loc)
+    #             case "HARD":
+    #                 hard_locations.append(new_loc)
 
-        self.included_locations.extend(
-            self.random.sample(easy_locations, k=round(self.options.TotalProblemCount * 0.4))
-        )
-        self.included_locations.extend(
-            self.random.sample(medium_locations, k=round(self.options.TotalProblemCount * 0.3))
-        )
-        self.included_locations.extend(
-            self.random.sample(hard_locations, k=round(self.options.TotalProblemCount * 0.3))
-        )
+    #     self.included_locations.extend(
+    #         self.random.sample(easy_locations, k=round(self.options.TotalProblemCount * 0.4))
+    #     )
+    #     self.included_locations.extend(
+    #         self.random.sample(medium_locations, k=round(self.options.TotalProblemCount * 0.3))
+    #     )
+    #     self.included_locations.extend(
+    #         self.random.sample(hard_locations, k=round(self.options.TotalProblemCount * 0.3))
+    #     )
 
-        self.included_locations = self.lightly_shuffle(
-            self.included_locations, 0.08
-        )  # Makes it so you don't only get easy problems in the first few batches, while still giving you generally easier problems at the start
+    #     self.included_locations = self.lightly_shuffle(
+    #         self.included_locations, 0.08
+    #     )  # Makes it so you don't only get easy problems in the first few batches, while still giving you generally easier problems at the start
 
-        for _ in range(
-            3
-        ):  # it's 4 AM and I'm too tired to figure out a better solution. I don't even know why it's happening. - ShackledMars261, 9/19/25 4:19 AM
-            dupe_check: list[str] = []
-            easys_to_add: int = 0
-            mediums_to_add: int = 0
-            hards_to_add: int = 0
-            for index, loc in enumerate(self.included_locations):
-                if loc.name not in dupe_check:
-                    dupe_check.append(loc.name)
-                    continue
-                self.included_locations.pop(index)
-                match loc.difficulty:
-                    case "EASY":
-                        easys_to_add += 1
-                    case "MEDIUM":
-                        mediums_to_add += 1
-                    case "HARD":
-                        hards_to_add += 1
+    #     for _ in range(
+    #         3
+    #     ):  # it's 4 AM and I'm too tired to figure out a better solution. I don't even know why it's happening. - ShackledMars261, 9/19/25 4:19 AM
+    #         dupe_check: list[str] = []
+    #         easys_to_add: int = 0
+    #         mediums_to_add: int = 0
+    #         hards_to_add: int = 0
+    #         for index, loc in enumerate(self.included_locations):
+    #             if loc.name not in dupe_check:
+    #                 dupe_check.append(loc.name)
+    #                 continue
+    #             self.included_locations.pop(index)
+    #             match loc.difficulty:
+    #                 case "EASY":
+    #                     easys_to_add += 1
+    #                 case "MEDIUM":
+    #                     mediums_to_add += 1
+    #                 case "HARD":
+    #                     hards_to_add += 1
 
-            for _ in range(easys_to_add):
-                self.included_locations.append(self.random.choice(easy_locations))
-            for _ in range(mediums_to_add):
-                self.included_locations.append(self.random.choice(medium_locations))
-            for _ in range(hards_to_add):
-                self.included_locations.append(self.random.choice(hard_locations))
+    #         for _ in range(easys_to_add):
+    #             self.included_locations.append(self.random.choice(easy_locations))
+    #         for _ in range(mediums_to_add):
+    #             self.included_locations.append(self.random.choice(medium_locations))
+    #         for _ in range(hards_to_add):
+    #             self.included_locations.append(self.random.choice(hard_locations))
 
-        self.included_locations.sort(
-            key=lambda loc: statistics.mean(
-                len(required_features) for required_features in loc.required_features.values()
-            )
-        )
+    #     self.included_locations.sort(
+    #         key=lambda loc: statistics.mean(
+    #             len(required_features) for required_features in loc.required_features.values()
+    #         )
+    #     )
 
     def set_rules(self):
         set_rules(self)
